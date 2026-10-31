@@ -7,3 +7,7 @@ print(f"        {application_name}")
 print("========================")
 print(description)
 print(f"Version: {version}")
+
+target = input("Enter target: ")
+print(f"Target: {target}")
+print("Starting diagnostics...")
