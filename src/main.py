@@ -8,6 +8,11 @@ print("========================")
 print(description)
 print(f"Version: {version}")
 
-target = input("Enter target: ")
-print(f"Target: {target}")
-print("Starting diagnostics...")
+target = input("Enter target: ").strip()
+
+if target == "":
+    print("No target provided. Exiting.")
+elif len(target) <= 3:
+    print("Target is too short. Exiting.")
+else:
+    print("Starting diagnostics...")
