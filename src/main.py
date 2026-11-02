@@ -1,4 +1,5 @@
 from validation import validate_target
+import sys
 
 application_name = "OpsPilot"
 version = "0.1"
@@ -35,8 +36,10 @@ def main():
     if is_valid_target:
         show_target(target)
         print("Valid target. Starting diagnostics...")
+        return 0
     else:
         print("Invalid target.")
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
