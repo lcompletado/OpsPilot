@@ -1,4 +1,5 @@
 from validation import validate_target
+from network import check_tcp
 import sys
 
 application_name = "OpsPilot"
@@ -36,7 +37,18 @@ def main():
     if is_valid_target:
         show_target(target)
         print("Valid target. Starting diagnostics...")
-        return 0
+        tcp_result = check_tcp(
+            target["host"],
+            target["port"]
+        )
+
+        print(f"TCP Check: {tcp_result}")
+
+        if tcp_result == "CONNECTED":
+            return 0
+        else:
+            return 1
+
     else:
         print("Invalid target.")
         return 1
