@@ -1,0 +1,14 @@
+{
+  "targets": [
+    {
+      "name": "Google",
+      "host": "google.com",
+      "port": 443
+    },
+    {
+      "name": "GitHub",
+      "host": "github.com",
+      "port": 443
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 from validation import validate_target
 from network import resolve_host, check_tcp
+from config import load_config
 import sys
 
 
@@ -15,23 +16,47 @@ def display_banner(application_name, version, description):
     print(description)
     print(f"Version: {version}")
 
+def run_diagnostics(target):
+    if not validate_target(target):
+        return {
+            "host": target.get("host"),
+            "ip_address": None,
+            "port": target.get("port"),
+            "dns": None,
+            "tcp": None,
+            "status": "INVALID"
+        }
 
-def show_target(target):
-    print(f"Target Name: {target['name']}")
-    print(f"Target Host: {target['host']}")
-    print(f"Target Port: {target['port']}")
-
-
-def input_target():
-    name = input("Enter target name: ").strip()
-    host = input("Enter target host: ").strip()
-    port_text = input("Enter target port: ").strip()
-
-    return {
-        "name": name,
-        "host": host,
-        "port": port_text
+    diagnostics = {
+        "host": target["host"],
+        "ip_address": None,
+        "port": target["port"],
+        "dns": "FAILED",
+        "tcp": None,
+        "status": "FAILED"
     }
+
+    ip_address = resolve_host(target["host"])
+
+    if ip_address is None:
+        diagnostics["status"] = "FAILED"
+        return diagnostics
+
+    diagnostics["ip_address"] = ip_address
+    diagnostics["dns"] = "PASS"
+
+    tcp_result = check_tcp(
+        ip_address,
+        target["port"]
+    )
+
+    diagnostics["tcp"] = tcp_result
+
+    if tcp_result == "CONNECTED":
+        diagnostics["status"] = "SUCCESS"
+
+    return diagnostics
+
 
 def show_diagnostics(diagnostics):
     print("\n--- Diagnostic Results ---")
@@ -40,59 +65,67 @@ def show_diagnostics(diagnostics):
     print(f"Port: {diagnostics['port']}")
     print(f"DNS: {diagnostics['dns']}")
     print(f"TCP: {diagnostics['tcp']}")
+    print(f"Status: {diagnostics['status']}")
+
 
 def main():
     display_banner(application_name, version, description)
 
-    target = input_target()
-    is_valid_target = validate_target(target)
+    config = load_config()
 
-    if not is_valid_target:
-        print("Invalid target.")
+    if config is None:
+        print("Failed to load configuration.")
         return 1
 
-    show_target(target)
-    print("Valid target. Starting diagnostics...")
+    targets = config.get("targets", [])
 
-    # Start the diagnostic report with what we already know.
-    diagnostics = {
-        "host": target["host"],
-        "ip_address": None,
-        "port": target["port"],
-        "dns": "FAILED",
-        "tcp": None
-    }
+    if not isinstance(targets, list):
+        print("Invalid configuration: 'targets' must be a list.")
+        return 1
 
-    # DNS resolution
-    ip_address = resolve_host(target["host"])
+    if not targets:
+        print("No targets found in configuration.")
+        return 1
 
-    if ip_address is None:
-        print("DNS Check: FAILED")
+    results = []
+    all_successful = True
+    invalid_targets = 0
+
+    for target in targets:
+        if not isinstance(target, dict):
+            print("Invalid target configuration: target must be an object.")
+            invalid_targets += 1
+            all_successful = False
+            continue
+
+        diagnostics = run_diagnostics(target)
+
+        results.append(diagnostics)
+
         show_diagnostics(diagnostics)
-        return 1
 
-    diagnostics["ip_address"] = ip_address
-    diagnostics["dns"] = "PASS"
+        if diagnostics["status"] != "SUCCESS":
+            all_successful = False
 
-    print("DNS Check: PASS")
-    print(f"Resolved IP: {ip_address}")
+    total = len(targets)
+    successful = 0
+    failed = invalid_targets
 
-    # TCP connectivity check
-    tcp_result = check_tcp(
-        ip_address,
-        target["port"]
-    )
+    for result in results:
+        if result["status"] == "SUCCESS":
+            successful += 1
+        else:
+            failed += 1
 
-    diagnostics["tcp"] = tcp_result
+    print("\n--- Run Summary ---")
+    print(f"Total: {total}")
+    print(f"Successful: {successful}")
+    print(f"Failed: {failed}")
 
-    print(f"TCP Check: {tcp_result}")
-    show_diagnostics(diagnostics)
-
-    if tcp_result == "CONNECTED":
+    if all_successful:
         return 0
 
     return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())
