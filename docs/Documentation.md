@@ -1,8 +1,8 @@
 # OpsPilot Learning Notes
 
-## Phase 0 - Engineering Workspace ✅
+## Phase 0: Engineering Workspace ✅
 
-### Virtual Environment
+### Virtual environment
 
 ```cmd
 python -m venv .venv
@@ -14,13 +14,13 @@ python -m venv .venv
 → isolated Python environment
 
 pip
-→ package installer
+→ installs Python packages
 
 requirements.txt
-→ project dependencies
+→ records required dependencies
 ```
 
-### Git
+### Git workflow
 
 ```text
 Working Directory
@@ -31,8 +31,6 @@ Local Repository
       ↓ git push
 GitHub
 ```
-
-Useful workflow:
 
 ```cmd
 git pull
@@ -47,46 +45,34 @@ git push
 ```text
 First time on another PC → git clone
 Before working           → git pull
-After committing         → git push
+Before switching PCs     → commit and push
 ```
 
 ---
 
-# Phase 1 - Python + CLI Foundation ✅
+## Phase 1: Python and CLI Foundation ✅
 
-### Python Types
-
-```text
-str   → text
-int   → whole number
-float → decimal
-bool  → True / False
-None  → no usable value
-```
-
-`input()` returns a string.
-
-### Functions
+### Function data flow
 
 ```text
 Argument
    ↓
 Parameter
    ↓
-Function Logic
+Function logic
    ↓
-Return Value
+Return value
 ```
 
 ```text
 print()
-→ communicates with user
+→ communicates with the user
 
 return
-→ sends value back to caller
+→ sends a value to the caller
 
 sys.exit()
-→ sends program status to OS
+→ sends the final status to the operating system
 ```
 
 ### Collections
@@ -97,14 +83,22 @@ List
 → accessed by index
 
 Dictionary
-→ key/value pairs
+→ key/value data
 → accessed by key
 
 for loop
-→ process each item
+→ processes every item
 ```
 
-### Exceptions
+### Exceptions and validation
+
+```text
+Exception
+→ operation could not be completed
+
+Validation failure
+→ value was understood but rejected by program rules
+```
 
 ```python
 try:
@@ -113,51 +107,31 @@ except ValueError:
     ...
 ```
 
-```text
-Exception
-→ operation could not be completed
-
-Validation failure
-→ value is understood but unacceptable
-```
-
 ### Modules
 
 ```text
 main.py
-→ application flow
+→ orchestration
 
 validation.py
-→ validation logic
-```
-
-### Entry Point
-
-```python
-if __name__ == "__main__":
-    sys.exit(main())
-```
-
-```text
-0 → success
-1 → failure
+→ input validation
 ```
 
 ---
 
-# Phase 2 - Network Diagnostics ✅
+## Phase 2: Network Diagnostics ✅
 
-## Network Basics
+### Network basics
 
 ```text
 IPv4 address
-→ address of a network interface
+→ address assigned to a network interface
 
-Subnet / CIDR
-→ helps determine what destinations are local
+Subnet/CIDR
+→ helps determine which destinations are local
 
 Routing table
-→ directions for where traffic should go
+→ directions for network traffic
 
 Default gateway
 → next-hop router used by the default route
@@ -166,120 +140,37 @@ Router
 → forwards traffic between networks
 ```
 
-Example:
-
-```text
-PC:      192.168.1.10/24
-Gateway: 192.168.1.1
-
-192.168.1.20 → local
-192.168.2.20 → non-local
-8.8.8.8      → non-local
-```
-
-## DNS
+### Diagnostic layers
 
 ```text
 Hostname
    ↓
 DNS
    ↓
-IP address
-```
-
-Manual tool:
-
-```cmd
-nslookup google.com
-```
-
-Python:
-
-```python
-socket.gethostbyname(host)
-```
-
-OpsPilot:
-
-```text
-resolve_host(host)
-
-success → IPv4 address
-failure → None
-```
-
-DNS success does not prove the application is healthy.
-
-## ICMP
-
-```cmd
-ping google.com
-```
-
-Uses:
-
-```text
-ICMP Echo Request
-        ↓
-Destination
-        ↓
-ICMP Echo Reply
-```
-
-Ping failure does not automatically mean the server or application is down.
-
-## TCP and Ports
-
-```text
-IP address
-→ destination address
-
+IPv4 address
+   ↓
+TCP connection
+   ↓
 Port
-→ network service endpoint
+   ↓
+Application layer later
 ```
 
-Common associations:
-
 ```text
-22  → SSH
-80  → HTTP
-443 → HTTPS
-```
-
-A listening TCP service is waiting for incoming connection attempts.
-
-### TCP Handshake
-
-```text
-Client              Server
-
-SYN       ──────────►
-          ◄───────── SYN-ACK
-ACK       ──────────►
-
-TCP established
-```
-
-## Manual Tools
-
-```text
-ipconfig
-→ local network configuration
-
 nslookup
 → DNS resolution
 
 ping
-→ ICMP reachability
+→ ICMP Echo Request/Reply
 
 route print
 → routing information
 
 Test-NetConnection
-→ TCP connection test
+→ TCP connection attempt
 ```
 
-## TCP Results
+### TCP results
 
 ```text
 CONNECTED
@@ -289,22 +180,13 @@ REFUSED
 → connection attempt was refused
 
 TIMEOUT
-→ connection did not complete within timeout
+→ connection did not complete within the timeout
 
 ERROR
-→ other network/OS failure
+→ another OS/network failure
 ```
 
-A timeout does not automatically mean a firewall caused the problem.
-
-## Python Socket
-
-```python
-socket.socket(
-    socket.AF_INET,
-    socket.SOCK_STREAM
-)
-```
+### Python sockets
 
 ```text
 AF_INET
@@ -312,102 +194,202 @@ AF_INET
 
 SOCK_STREAM
 → TCP
-
-socket
-→ software interface used by the program
-  for network communication through the OS
 ```
-
-Socket lifecycle:
 
 ```text
-Create
-  ↓
+Create socket
+    ↓
 Set timeout
-  ↓
+    ↓
 Connect
-  ↓
+    ↓
 Handle result
-  ↓
-Close
+    ↓
+Close socket
 ```
 
-`finally` ensures the socket closes whether the connection succeeds or fails.
-
-## Current Network Functions
+### Network functions
 
 ```text
 resolve_host(host)
-→ hostname to IPv4 address
+→ returns IPv4 address or None
 
 check_tcp(ip_address, port)
-→ TCP connectivity result
+→ returns CONNECTED, REFUSED, TIMEOUT, or ERROR
 ```
 
-## Current Architecture
+Important:
 
 ```text
-User
- ↓
-Input
- ↓
-Validation
- ↓
-Hostname
- ↓
-DNS Resolution
- ↓
-IPv4 Address
- ↓
-TCP Connection
- ↓
-Diagnostic Result
- ↓
-Exit Code
-```
-
-Current modules:
-
-```text
-main.py
-→ orchestrates OpsPilot
-
-validation.py
-→ validates input
-
-network.py
-→ performs DNS and TCP operations
-```
-
-## Key Troubleshooting Rule
-
-Do not report:
-
-```text
-SERVER WORKING
-SERVER BROKEN
-```
-
-without enough evidence.
-
-Instead identify the layer:
-
-```text
-DNS: PASS / FAILED
-TCP: CONNECTED / REFUSED / TIMEOUT / ERROR
-```
-
 DNS success does not prove TCP works.
 
 TCP success does not prove the application is healthy.
+```
+
+---
+
+## Phase 3: Configuration and JSON ✅
+
+### Code versus configuration
+
+```text
+Code
+→ how OpsPilot works
+
+Configuration
+→ which targets OpsPilot diagnoses
+```
+
+### JSON mapping
+
+```text
+JSON object  → Python dict
+JSON array   → Python list
+JSON string  → Python str
+JSON number  → Python int/float
+JSON boolean → Python bool
+JSON null    → Python None
+```
+
+### File loading
+
+```python
+with open("config.json", "r") as file:
+    config = json.load(file)
+```
+
+```text
+open()
+→ opens the file
+
+with
+→ manages and closes the file
+
+json.load()
+→ parses JSON into Python data
+```
+
+### Current flow
+
+```text
+config.json
+    ↓
+load_config()
+    ↓
+config dictionary
+    ↓
+targets list
+    ↓
+for target in targets
+    ↓
+run_diagnostics(target)
+    ↓
+diagnostic dictionary
+    ↓
+results.append(diagnostics)
+    ↓
+run summary
+```
+
+### Failure handling
+
+```text
+Missing config file
+→ stop entire run
+
+Broken JSON
+→ stop entire run
+
+Empty/invalid targets list
+→ stop entire run
+
+One invalid target
+→ record failure
+→ continue to remaining targets
+```
+
+### `continue` versus `return`
+
+```text
+continue
+→ skip the current loop iteration
+→ process the next target
+
+return
+→ leave the entire function
+```
+
+### Results
+
+```text
+results
+→ list of diagnostic dictionaries
+
+all_successful
+→ True only if every target succeeded
+```
+
+Example summary:
+
+```text
+Total: 3
+Successful: 2
+Failed: 1
+```
+
+---
+
+# Topics to Reinforce
+
+Phases 0–3 are complete, but these should be reviewed during future development.
+
+## Python
+
+- argument versus parameter
+- `print()` versus `return`
+- values returned by nested functions
+- local versus global scope
+- indentation and block structure
+- `continue` versus `return`
+- updating dictionaries
+- lists of dictionaries
+- state tracking across loops
+- `results.append(diagnostics)`
+
+## JSON and Configuration
+
+- JSON object versus array
+- Python `dict` versus `list`
+- parsing with `json.load()`
+- valid JSON versus valid OpsPilot configuration
+- file-level failure versus individual-target failure
+
+## Networking
+
+- subnet and CIDR boundaries
+- routing table versus default gateway
+- router terminology
+- listening versus connected
+- TCP three-way handshake
+- DNS failure versus TCP failure
+- TCP success versus application health
+- socket as a program's interface to OS networking
+
+## Git
+
+- continue using the normal pull, inspect, stage, commit, and push workflow
+- branches, merge conflicts, and pull requests remain future topics
 
 ---
 
 # Progress
 
 ```text
-Phase 0 - Engineering Workspace       ✅
-Phase 1 - Python + CLI Foundation     ✅
-Phase 2 - Network Diagnostics         ✅
-Phase 3                              NEXT
+Phase 0: Engineering Workspace                  ✅
+Phase 1: Python and CLI Foundation              ✅
+Phase 2: Network Diagnostics                    ✅
+Phase 3: JSON and Multi-Target Configuration    ✅
+Next Phase                                      NEXT
 ```
+
+Completion means the concepts were implemented successfully. It does not mean every concept is permanently mastered. The review list should be reinforced through continued OpsPilot development.
