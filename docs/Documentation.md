@@ -1,26 +1,21 @@
 # OpsPilot Learning Notes
 
-## Phase 0: Engineering Workspace ✅
+# Phase 0 - Engineering Workspace ✅
 
-### Virtual environment
-
-```cmd
-python -m venv .venv
-.venv\Scripts\activate
-```
+## Python Environment
 
 ```text
 .venv
 → isolated Python environment
 
 pip
-→ installs Python packages
+→ installs packages
 
 requirements.txt
-→ records required dependencies
+→ records project dependencies
 ```
 
-### Git workflow
+## Git Flow
 
 ```text
 Working Directory
@@ -32,6 +27,8 @@ Local Repository
 GitHub
 ```
 
+Common workflow:
+
 ```cmd
 git pull
 git status
@@ -42,151 +39,129 @@ git commit -m "message"
 git push
 ```
 
-```text
-First time on another PC → git clone
-Before working           → git pull
-Before switching PCs     → commit and push
-```
-
 ---
 
-## Phase 1: Python and CLI Foundation ✅
+# Phase 1 - Python and CLI Foundation ✅
 
-### Function data flow
+## Function Flow
 
 ```text
 Argument
    ↓
 Parameter
    ↓
-Function logic
+Function Logic
    ↓
-Return value
+Return Value
 ```
 
 ```text
 print()
-→ communicates with the user
+→ communicate with user
 
 return
-→ sends a value to the caller
+→ send value to caller
 
 sys.exit()
-→ sends the final status to the operating system
+→ report program status to OS
 ```
 
-### Collections
+## Data Structures
 
 ```text
 List
 → multiple items
-→ accessed by index
 
 Dictionary
 → key/value data
-→ accessed by key
 
-for loop
-→ processes every item
+List of dictionaries
+→ multiple structured objects
 ```
 
-### Exceptions and validation
+## Exceptions
 
 ```text
-Exception
-→ operation could not be completed
+try
+→ attempt operation
 
-Validation failure
-→ value was understood but rejected by program rules
-```
+except
+→ handle expected failure
 
-```python
-try:
-    ...
-except ValueError:
-    ...
-```
-
-### Modules
-
-```text
-main.py
-→ orchestration
-
-validation.py
-→ input validation
+finally
+→ always run cleanup
 ```
 
 ---
 
-## Phase 2: Network Diagnostics ✅
+# Phase 2 - Network Diagnostics ✅
 
-### Network basics
+## Network Basics
 
 ```text
 IPv4 address
-→ address assigned to a network interface
+→ network interface address
 
 Subnet/CIDR
-→ helps determine which destinations are local
+→ determines what is local
 
 Routing table
 → directions for network traffic
 
 Default gateway
-→ next-hop router used by the default route
+→ next hop used by default route
 
 Router
 → forwards traffic between networks
 ```
 
-### Diagnostic layers
+## Network Layers
 
 ```text
 Hostname
    ↓
 DNS
    ↓
-IPv4 address
+IP Address
    ↓
-TCP connection
+TCP
    ↓
 Port
-   ↓
-Application layer later
 ```
+
+Useful tools:
 
 ```text
 nslookup
-→ DNS resolution
+→ DNS
 
 ping
-→ ICMP Echo Request/Reply
+→ ICMP
 
 route print
-→ routing information
+→ routing
 
 Test-NetConnection
-→ TCP connection attempt
+→ TCP
 ```
 
-### TCP results
+## TCP Results
 
 ```text
 CONNECTED
-→ TCP connection established
-
 REFUSED
-→ connection attempt was refused
-
 TIMEOUT
-→ connection did not complete within the timeout
-
 ERROR
-→ another OS/network failure
 ```
 
-### Python sockets
+Important:
+
+```text
+DNS success ≠ TCP success
+TCP success ≠ application health
+```
+
+## Python Socket
 
 ```text
 AF_INET
@@ -197,50 +172,32 @@ SOCK_STREAM
 ```
 
 ```text
-Create socket
-    ↓
-Set timeout
-    ↓
+Create
+ ↓
+Configure
+ ↓
 Connect
-    ↓
+ ↓
 Handle result
-    ↓
-Close socket
-```
-
-### Network functions
-
-```text
-resolve_host(host)
-→ returns IPv4 address or None
-
-check_tcp(ip_address, port)
-→ returns CONNECTED, REFUSED, TIMEOUT, or ERROR
-```
-
-Important:
-
-```text
-DNS success does not prove TCP works.
-
-TCP success does not prove the application is healthy.
+ ↓
+Close
 ```
 
 ---
 
-## Phase 3: Configuration and JSON ✅
+# Phase 3 - Configuration and Data ✅
 
-### Code versus configuration
+## Code vs Configuration
 
 ```text
 Code
 → how OpsPilot works
 
 Configuration
-→ which targets OpsPilot diagnoses
+→ what OpsPilot operates on
 ```
 
-### JSON mapping
+## JSON Mapping
 
 ```text
 JSON object  → Python dict
@@ -251,7 +208,7 @@ JSON boolean → Python bool
 JSON null    → Python None
 ```
 
-### File loading
+## Loading Configuration
 
 ```python
 with open("config.json", "r") as file:
@@ -260,136 +217,385 @@ with open("config.json", "r") as file:
 
 ```text
 open()
-→ opens the file
+→ opens file
 
 with
-→ manages and closes the file
+→ manages resource lifecycle
 
 json.load()
-→ parses JSON into Python data
+→ parses JSON file into Python data
 ```
 
-### Current flow
+## Multi-Target Flow
 
 ```text
 config.json
-    ↓
-load_config()
-    ↓
-config dictionary
     ↓
 targets list
     ↓
 for target in targets
     ↓
-run_diagnostics(target)
+validate
     ↓
-diagnostic dictionary
+diagnose
     ↓
 results.append(diagnostics)
     ↓
 run summary
 ```
 
-### Failure handling
+## Failure Isolation
 
 ```text
-Missing config file
-→ stop entire run
+Global configuration failure
+→ stop run
 
-Broken JSON
-→ stop entire run
-
-Empty/invalid targets list
-→ stop entire run
-
-One invalid target
+Individual target failure
 → record failure
-→ continue to remaining targets
+→ continue
 ```
-
-### `continue` versus `return`
 
 ```text
 continue
-→ skip the current loop iteration
-→ process the next target
+→ next loop iteration
 
 return
-→ leave the entire function
-```
-
-### Results
-
-```text
-results
-→ list of diagnostic dictionaries
-
-all_successful
-→ True only if every target succeeded
-```
-
-Example summary:
-
-```text
-Total: 3
-Successful: 2
-Failed: 1
+→ leave entire function
 ```
 
 ---
 
-# Topics to Reinforce
+# Phase 4 - HTTP and REST API Checks ✅
 
-Phases 0–3 are complete, but these should be reviewed during future development.
+## HTTP
 
-## Python
+```text
+Client
+   ↓ request
+Server
+   ↓ response
+Client
+```
 
-- argument versus parameter
-- `print()` versus `return`
-- values returned by nested functions
-- local versus global scope
-- indentation and block structure
-- `continue` versus `return`
-- updating dictionaries
-- lists of dictionaries
-- state tracking across loops
-- `results.append(diagnostics)`
+OpsPilot currently acts as the HTTP client.
 
-## JSON and Configuration
+## URL
 
-- JSON object versus array
-- Python `dict` versus `list`
-- parsing with `json.load()`
-- valid JSON versus valid OpsPilot configuration
-- file-level failure versus individual-target failure
+```text
+https://api.example.com:443/health
 
-## Networking
+https
+→ scheme
 
-- subnet and CIDR boundaries
-- routing table versus default gateway
-- router terminology
-- listening versus connected
-- TCP three-way handshake
-- DNS failure versus TCP failure
-- TCP success versus application health
-- socket as a program's interface to OS networking
+api.example.com
+→ hostname
 
-## Git
+443
+→ port
 
-- continue using the normal pull, inspect, stage, commit, and push workflow
-- branches, merge conflicts, and pull requests remain future topics
+/health
+→ path
+```
+
+## HTTP Response
+
+```text
+Status
+→ high-level result
+
+Headers
+→ response metadata
+
+Body
+→ returned content
+```
+
+Example:
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"status": "healthy"}
+```
+
+## Status Codes
+
+```text
+2xx → success
+3xx → redirect
+4xx → client/request-side response
+5xx → server/service-side response
+```
+
+OpsPilot classification:
+
+```text
+200 → HEALTHY
+301 → REDIRECT
+404 → CLIENT_ERROR
+503 → SERVER_ERROR
+```
+
+## API Concepts
+
+```text
+API
+→ interface for software interaction
+
+REST API
+→ web API style using HTTP resources,
+  URLs, methods, and responses
+
+HTTP
+→ request/response protocol
+
+JSON
+→ structured data format
+```
+
+Important:
+
+```text
+JSON ≠ REST API
+
+application/json
+→ response body uses JSON
+```
+
+## HTTP Methods
+
+```text
+GET
+→ retrieve
+
+POST
+→ create/submit
+
+PUT
+→ replace/update
+
+PATCH
+→ partially update
+
+DELETE
+→ remove
+```
+
+OpsPilot currently mainly uses `GET` because it observes systems rather than modifying them.
+
+## Manual HTTP Check
+
+```cmd
+curl.exe -I https://www.google.com/
+```
+
+Used to inspect HTTP response status and headers.
+
+## Python HTTP
+
+```text
+check_http(url)
+→ makes HTTP request
+→ handles timeout/errors
+→ reads response
+→ optionally parses JSON
+→ returns structured result
+```
+
+Example:
+
+```python
+{
+    "status_code": 200,
+    "result": "SUCCESS",
+    "data": None
+}
+```
+
+## HTTP Errors
+
+```text
+HTTPError
+→ HTTP response such as 404/503 was received
+
+URLError
+→ request failed before a normal HTTP response
+
+TIMEOUT
+→ response did not arrive within configured limit
+```
+
+## JSON HTTP Body
+
+```text
+HTTP response
+    ↓
+response.read()
+    ↓
+bytes
+    ↓
+decode()
+    ↓
+str
+    ↓
+json.loads()
+    ↓
+Python dict/list
+```
+
+Remember:
+
+```text
+json.load(file)
+→ JSON from file
+
+json.loads(text)
+→ JSON from string
+```
+
+## HTTP Health
+
+```text
+HTTP result
+→ what happened during the request
+
+HTTP health
+→ classification of the response
+```
+
+Example:
+
+```text
+HTTP Result: SUCCESS
+HTTP Status: 200
+HTTP Health: HEALTHY
+```
+
+## Full Diagnostic Stack
+
+```text
+Configuration
+     ↓
+Validation
+     ↓
+DNS
+     ↓
+TCP
+     ↓
+TLS / HTTPS
+     ↓
+HTTP
+     ↓
+Status Code
+     ↓
+HTTP Health
+     ↓
+Overall Status
+```
+
+Important:
+
+```text
+DNS PASS
+does not guarantee TCP PASS.
+
+TCP CONNECTED
+does not guarantee HTTP HEALTHY.
+
+HTTP failure
+does not automatically mean network failure.
+```
+
+---
+
+# Reinforcement Checklist
+
+## Phase 0
+
+- [ ] Working directory → staging → commit → push
+- [ ] `git diff` vs `git diff --staged`
+- [ ] `git clone` vs `git pull`
+- [ ] Virtual environment vs dependency
+
+## Phase 1
+
+- [ ] Argument vs parameter
+- [ ] `print()` vs `return`
+- [ ] Follow values across function calls
+- [ ] Local vs global scope
+- [ ] List vs dictionary
+- [ ] List of dictionaries
+- [ ] `continue` vs `return`
+- [ ] `try / except / finally`
+- [ ] `main()` as orchestrator
+
+## Phase 2
+
+- [ ] Subnet/CIDR boundaries
+- [ ] Routing table vs default gateway
+- [ ] Router terminology
+- [ ] Listening vs connected
+- [ ] TCP SYN → SYN-ACK → ACK
+- [ ] DNS vs TCP failure
+- [ ] Socket lifecycle
+- [ ] TCP timeout does not identify root cause
+
+## Phase 3
+
+- [ ] JSON object → `dict`
+- [ ] JSON array → `list`
+- [ ] `json.load()` and parsing
+- [ ] Valid JSON vs valid configuration
+- [ ] `continue` vs `return`
+- [ ] `results.append(diagnostics)`
+- [ ] Tracking state across loops
+- [ ] Global vs individual-target failures
+
+## Phase 4
+
+- [ ] API vs REST API
+- [ ] HTTP vs HTTPS/TLS
+- [ ] PUT vs PATCH
+- [ ] Status vs headers vs body
+- [ ] `application/json` means JSON content, not REST API
+- [ ] `HTTPError` vs `URLError`
+- [ ] `check_http()` returns a dictionary
+- [ ] HTTP result vs HTTP health
+- [ ] `json.load()` vs `json.loads()`
+- [ ] DNS → TCP → TLS → HTTP layering
+- [ ] TCP CONNECTED ≠ application HEALTHY
+
+---
+
+# Highest-Priority Review
+
+If concepts start feeling fuzzy, review these first:
+
+1. **Argument → Parameter → Logic → Return**
+2. **List vs Dictionary vs List of Dictionaries**
+3. **`continue` vs `return`**
+4. **JSON → Parse → Python structures**
+5. **Subnet → Routing → Default Gateway**
+6. **DNS → IP → TCP → Port**
+7. **Listening vs Connected**
+8. **HTTP Request → Response**
+9. **Status → Headers → Body**
+10. **API vs REST API vs HTTP vs JSON**
+11. **DNS ≠ TCP ≠ HTTP**
+12. **One successful layer does not prove every higher layer is healthy**
 
 ---
 
 # Progress
 
 ```text
-Phase 0: Engineering Workspace                  ✅
-Phase 1: Python and CLI Foundation              ✅
-Phase 2: Network Diagnostics                    ✅
-Phase 3: JSON and Multi-Target Configuration    ✅
-Next Phase                                      NEXT
+Phase 0 - Engineering Workspace             ✅
+Phase 1 - Python and CLI Foundation         ✅
+Phase 2 - Network Diagnostics               ✅
+Phase 3 - Configuration and Data            ✅
+Phase 4 - HTTP and REST API Checks          ✅
+Phase 5 - Linux Systems Diagnostics         NEXT
 ```
 
-Completion means the concepts were implemented successfully. It does not mean every concept is permanently mastered. The review list should be reinforced through continued OpsPilot development.
+> Passing a phase means the concepts are understood well enough to continue. It does not mean every concept is permanently mastered. Future OpsPilot phases should continue reinforcing earlier concepts through real use.

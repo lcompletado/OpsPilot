@@ -2,13 +2,17 @@
   "targets": [
     {
       "name": "Google",
-      "host": "google.com",
-      "port": 443
+      "host": "www.google.com",
+      "port": 443,
+      "scheme": "https",
+      "path": "/"
     },
     {
       "name": "GitHub",
       "host": "github.com",
-      "port": 443
+      "port": 443,
+      "scheme": "https",
+      "path": "/"
     }
   ]
 }

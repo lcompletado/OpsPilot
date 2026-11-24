@@ -1,6 +1,7 @@
 from validation import validate_target
 from network import resolve_host, check_tcp
 from config import load_config
+from http_check import check_http, classify_http
 import sys
 
 
@@ -16,6 +17,7 @@ def display_banner(application_name, version, description):
     print(description)
     print(f"Version: {version}")
 
+
 def run_diagnostics(target):
     if not validate_target(target):
         return {
@@ -24,6 +26,9 @@ def run_diagnostics(target):
             "port": target.get("port"),
             "dns": None,
             "tcp": None,
+            "http_status": None,
+            "http_result": None,
+            "http_health": None,
             "status": "INVALID"
         }
 
@@ -33,18 +38,22 @@ def run_diagnostics(target):
         "port": target["port"],
         "dns": "FAILED",
         "tcp": None,
+        "http_status": None,
+        "http_result": None,
+        "http_health": None,
         "status": "FAILED"
     }
 
+    # DNS
     ip_address = resolve_host(target["host"])
 
     if ip_address is None:
-        diagnostics["status"] = "FAILED"
         return diagnostics
 
     diagnostics["ip_address"] = ip_address
     diagnostics["dns"] = "PASS"
 
+    # TCP
     tcp_result = check_tcp(
         ip_address,
         target["port"]
@@ -52,7 +61,31 @@ def run_diagnostics(target):
 
     diagnostics["tcp"] = tcp_result
 
-    if tcp_result == "CONNECTED":
+    if tcp_result != "CONNECTED":
+        return diagnostics
+
+    # HTTP
+    url = (
+        f"{target['scheme']}://"
+        f"{target['host']}"
+        f"{target['path']}"
+    )
+
+    http_result = check_http(url)
+
+    diagnostics["http_status"] = http_result["status_code"]
+    diagnostics["http_result"] = http_result["result"]
+
+    # HTTP health classification
+    http_health = classify_http(
+        http_result["status_code"],
+        http_result["result"]
+    )
+
+    diagnostics["http_health"] = http_health
+
+    # Overall target succeeds only when HTTP is healthy
+    if http_health == "HEALTHY":
         diagnostics["status"] = "SUCCESS"
 
     return diagnostics
@@ -65,11 +98,18 @@ def show_diagnostics(diagnostics):
     print(f"Port: {diagnostics['port']}")
     print(f"DNS: {diagnostics['dns']}")
     print(f"TCP: {diagnostics['tcp']}")
+    print(f"HTTP Status: {diagnostics['http_status']}")
+    print(f"HTTP Result: {diagnostics['http_result']}")
+    print(f"HTTP Health: {diagnostics['http_health']}")
     print(f"Status: {diagnostics['status']}")
 
 
 def main():
-    display_banner(application_name, version, description)
+    display_banner(
+        application_name,
+        version,
+        description
+    )
 
     config = load_config()
 
@@ -93,7 +133,10 @@ def main():
 
     for target in targets:
         if not isinstance(target, dict):
-            print("Invalid target configuration: target must be an object.")
+            print(
+                "Invalid target configuration: "
+                "target must be an object."
+            )
             invalid_targets += 1
             all_successful = False
             continue
@@ -107,6 +150,7 @@ def main():
         if diagnostics["status"] != "SUCCESS":
             all_successful = False
 
+    # Run summary
     total = len(targets)
     successful = 0
     failed = invalid_targets
@@ -126,6 +170,7 @@ def main():
         return 0
 
     return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

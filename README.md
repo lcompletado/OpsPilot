@@ -1,47 +1,64 @@
 # OpsPilot
 
-OpsPilot is a personal learning project for developing practical skills in Python, networking, Git, configuration, automation, and infrastructure troubleshooting.
+OpsPilot is a personal infrastructure diagnostics learning project built to develop practical skills in Python, networking, APIs, Linux, cloud, automation, DevOps, and SRE.
 
-The project is built incrementally. Each phase adds a working capability while reinforcing clean code, troubleshooting, and production-style engineering habits.
+The project grows incrementally, with each phase adding a new capability while reinforcing previous concepts.
 
 ## Progress
 
-### Phase 0: Engineering Workspace ✅
+### Phase 0 - Engineering Workspace ✅
 
 - Python virtual environment
 - Git and GitHub workflow
-- `.gitignore` and `requirements.txt`
+- `.gitignore`
+- `requirements.txt`
+- Project structure
 - Multi-PC development workflow
-- Project structure and reproducibility
 
-### Phase 1: Python and CLI Foundation ✅
+### Phase 1 - Python and CLI Foundation ✅
 
 - Variables and data types
-- Input, conditions, and validation
-- Functions, parameters, arguments, and returns
+- Input and validation
+- Functions and return values
 - Lists, dictionaries, and loops
 - Exception handling
-- Modules, imports, and exit codes
+- Modules and imports
+- Exit codes
 
-### Phase 2: Network Diagnostics ✅
+### Phase 2 - Network Diagnostics ✅
 
 - IPv4, subnet, gateway, and routing fundamentals
 - DNS resolution
 - ICMP and ping
-- TCP, ports, and listening services
+- TCP and ports
 - Python sockets
-- TCP results: connected, refused, timeout, and error
+- Connection states and timeouts
 - Structured diagnostic results
 
-### Phase 3: JSON Configuration and Multiple Targets ✅
+### Phase 3 - Configuration and Data ✅
 
-- JSON fundamentals
-- Reading and parsing files
+- JSON configuration
+- File handling and parsing
+- Multiple targets
 - Configuration validation
-- Multiple configured targets
-- Failure isolation with `continue`
-- Results collection and run summaries
-- Overall batch exit status
+- Failure isolation
+- Results collection
+- Run summaries
+
+### Phase 4 - HTTP and REST API Checks ✅
+
+- HTTP and HTTPS fundamentals
+- URLs
+- HTTP requests and responses
+- Status codes
+- Headers and response bodies
+- API and REST API fundamentals
+- Manual HTTP testing with curl
+- Python HTTP requests
+- HTTP timeout/error handling
+- JSON API responses
+- HTTP health classification
+- Layered application diagnostics
 
 ## Current Architecture
 
@@ -52,66 +69,67 @@ config.py
     ↓
 main.py
    ├── validation.py
-   └── network.py
+   ├── network.py
+   └── http_check.py
 ```
+
+### Responsibilities
 
 ```text
 config.json
-→ configured targets
+→ configured diagnostic targets
 
 config.py
 → loads and parses configuration
 
 main.py
-→ orchestrates the diagnostic run
+→ orchestrates the diagnostic workflow
 
 validation.py
 → validates and normalizes target data
 
 network.py
-→ performs DNS resolution and TCP checks
+→ DNS and TCP diagnostics
+
+http_check.py
+→ HTTP requests and health classification
 ```
 
-## Current Capability
-
-OpsPilot can:
-
-1. Load multiple targets from `config.json`.
-2. Validate each target.
-3. Resolve each hostname to an IPv4 address.
-4. Attempt a TCP connection to the configured port.
-5. Classify the result.
-6. Continue when an individual target fails.
-7. Collect and summarize all results.
-8. Return an overall exit code.
-
-Possible results include:
+## Current Diagnostic Flow
 
 ```text
-SUCCESS
-INVALID
-FAILED
-
-DNS: PASS / FAILED
-TCP: CONNECTED / REFUSED / TIMEOUT / ERROR
+Target
+  ↓
+Validation
+  ↓
+DNS Resolution
+  ↓
+IPv4 Address
+  ↓
+TCP Connection
+  ↓
+HTTP/HTTPS Request
+  ↓
+Status Code
+  ↓
+HTTP Health
+  ↓
+Diagnostic Result
+  ↓
+Run Summary
 ```
 
-## Project Structure
+Example:
 
 ```text
-OpsPilot/
-├── config.json
-├── src/
-│   ├── main.py
-│   ├── config.py
-│   ├── validation.py
-│   └── network.py
-├── tests/
-├── Documentation.md
-├── README.md
-├── requirements.txt
-└── .gitignore
+DNS: PASS
+TCP: CONNECTED
+HTTP Status: 200
+HTTP Health: HEALTHY
+Status: SUCCESS
 ```
+
+OpsPilot reports each layer separately instead of simply reporting a target as working or broken.
 
 ## Run
 
@@ -120,25 +138,30 @@ OpsPilot/
 python src\main.py
 ```
 
+Run from the project root so OpsPilot can locate `config.json`.
+
 ## Exit Codes
 
 ```text
 0 = all configured targets succeeded
-1 = configuration, validation, DNS, or TCP failure
+1 = one or more configuration or diagnostic failures
 ```
 
-## Current Learning Status
+## Learning Status
 
-Phases 0–3 are complete, but some concepts still need reinforcement through continued use:
+Phases 0-4 are complete.
 
-- argument versus parameter
-- return values and data flow
+Some concepts still require reinforcement through continued development:
+
+- parameters, arguments, and return values
 - `continue` versus `return`
 - lists of dictionaries
-- JSON object/array mapping
-- tracking state across loops
-- subnet, gateway, and routing terminology
-- listening versus connected TCP states
-- layered DNS, TCP, and application troubleshooting
+- JSON type mapping and parsing
+- routing and default gateway terminology
+- TCP listening versus connected
+- API versus REST API
+- `HTTPError` versus `URLError`
+- HTTP result versus HTTP health
+- layered DNS → TCP → HTTP troubleshooting
 
-These are not blockers for the next phase. They should be reviewed naturally while OpsPilot continues to grow.
+These are not blockers for the next phase. They will continue to be reinforced as OpsPilot grows.
